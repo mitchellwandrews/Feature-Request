@@ -1,6 +1,8 @@
 <html>
   <head>
     <script src="{{ url_for('static', filename='node_modules/jquery/dist/jquery.js')}}"></script>
+    <script src="{{ url_for('static', filename='node_modules/bootstrap/dist/js/bootstrap.js')}}"></script>
+    <script src="{{ url_for('static', filename='node_modules/moment/moment.js')}}"></script>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='node_modules/bootstrap/dist/css/bootstrap.css')}}">
   </head>
   <body>
@@ -24,71 +26,125 @@
             <th scope="col">Client</th>
             <th scope="col">Target Date</th>
             <th scope="col">Area</th>
+            <th scope="col">Actions</th>
           </tr>
         </thead>
-        <tbody>
-          {% for ticket in tickets %}
-            <tr>
-              <td><a href="#" data-bind="click: goToTicket">{{ticket.title}}</a></td>
-              <td>{{ticket.client_priority}}</td>
-              <td>{{ticket.client}}</td>
-              <td>{{ticket.target_date}}</td>
-              <td>{{ticket.product_area}}
-            </tr>
-          {% endfor %}
+        <tbody data-bind="foreach: tickets">
+          <tr>
+            <td><a href data-bind="click: $parent.goToTicket"><span data-bind="text: title"></span></a></td>
+            <td><span data-bind="text: client_priority"></span></td>
+            <td><span data-bind="text: client"></span></td>
+            <td><span data-bind="text: target_date"></span></td>
+            <td><span data-bind="text: product_area"></span></td>
+            <td>
+              <button type="button" class="btn btn-warning btn-sm" data-bind="click: $parent.editTicket">Edit</button>
+              <button type="button" class="btn btn-danger btn-sm" data-bind="click: $parent.showDeleteModal">Delete</button>
+            </td>
+          </tr>
         </tbody>
       </table>
-    </script>
-    <script type="text/html" Id="add">
-        <div class="row mt-3">
-          <div class="col-6 col-sm-3 offset-sm-3">
-            <h1>Add Ticket</h1>
-          </div>
-          <div class="col-6 col-sm-3 text-right flex-column justify-content-center">
-            <a class="btn btn-success" role="button" href="#" data-bind="click: goToIndex">Go Back</a>
-          </div>
-          <div class="col-12 col-sm-6 offset-sm-3">
-            <form class="mt-3" data-bind="submit: addTicket">
-              <div class="form-group">
-                <label>Title</label>
-                <input type="text" class="form-control" data-bind="value: ticket.title"/>
-              </div>
-              <div class="form-group">
-                <label>Description</label>
-                <textarea class="form-control" rows="5" data-bind="value: ticket.description"></textarea>
-              </div>
-              <div class="form-group">
-                <label>Client</label>
-                <select class="form-control" data-bind="value: ticket.client">
-                  <option>Client A</option>
-                  <option>Client B</option>
-                  <option>Client C</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Client Priority</label>
-                <input type="number" class="form-control" data-bind="value: ticket.client_priority"/>
-              </div>
-              <div class="form-group">
-                <label>Target Date</label>
-                <input type="date" class="form-control" data-bind="value: ticket.target_date"/>
-              </div>
-              <div class="form-group">
-                <label>Product Area</label>
-                <select class="form-control" data-bind="value: ticket.product_area">
-                  <option>Policies</option>
-                  <option>Billing</option>
-                  <option>Claims</option>
-                  <option>Reports</option>
-                </select>
-              </div>
-              <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
+      <div class="modal fade" id="deleteTicketModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Delete Ticket</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>Are you sure you want to delete <span data-bind="text: ticket.title"></span>?</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-danger" data-bind="click: deleteTicket">Delete</button>
+            </div>
           </div>
         </div>
-      </script>
+      </div>
+    </script>
+    <script type="text/html" Id="add">
+      <div class="row mt-3">
+        <div class="col-6 col-sm-3 offset-sm-3">
+          <h1><span data-bind="text: ticketType"></span> Ticket</h1>
+        </div>
+        <div class="col-6 col-sm-3 text-right flex-column justify-content-center">
+          <a class="btn btn-success" role="button" href="#" data-bind="click: goToIndex">Go Back</a>
+        </div>
+        <div class="col-12 col-sm-6 offset-sm-3">
+          <form id="ticketForm" class="mt-3" data-bind="submit: addTicket">
+            <div class="form-group">
+              <label>Title</label>
+              <input type="text" class="form-control" data-bind="value: ticket.title"/>
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea class="form-control" rows="5" data-bind="value: ticket.description"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Client</label>
+              <select class="form-control" data-bind="value: ticket.client">
+                <option>Client A</option>
+                <option>Client B</option>
+                <option>Client C</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Client Priority</label>
+              <input type="number" class="form-control" data-bind="value: ticket.client_priority"/>
+            </div>
+            <div class="form-group">
+              <label>Target Date</label>
+              <input type="date" class="form-control" data-bind="date: ticket.target_date"/>
+            </div>
+            <div class="form-group">
+              <label>Product Area</label>
+              <select class="form-control" data-bind="value: ticket.product_area">
+                <option>Policies</option>
+                <option>Billing</option>
+                <option>Claims</option>
+                <option>Reports</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+    </script>
+    <script type="text/html" Id="oneup">
+      <div class="row mt-3">
+        <div class="col-12 col-sm-6 offset-sm-3">
+          <h1 data-bind="text: ticket.title"></h1>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12 col-sm-6 offset-sm-3">
+          <p data-bind="text: ticket.description"></p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-6 col-sm-3 offset-sm-3">
+          <p><strong>Client</strong></p>
+          <p data-bind="text: ticket.client"></p>
+        </div>
+        <div class="col-6 col-sm-3">
+          <p><strong>Client Priority</strong></p>
+          <p data-bind="text: ticket.client_priority"></p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-6 col-sm-3 offset-sm-3">
+          <p><strong>Target Date</strong></p>
+          <p data-bind="text: ticket.target_date"></p>
+        </div>
+        <div class="col-6 col-sm-3">
+          <p><strong>Product Area</strong></p>
+          <p data-bind="text: ticket.product_area"></p>
+        </div>
+      </div>
+    </script>
     <script src="{{ url_for('static', filename='node_modules/knockout/build/output/knockout-latest.js')}}"></script>
-    <script type="text/html" Id="oneup"></script>
+    <script src="{{ url_for('static', filename='node_modules/knockout-date-bindings/knockout-date-bindings.js')}}"></script>
     <script src="{{ url_for('static', filename='app.js')}}"></script>
   </body>
 </html>

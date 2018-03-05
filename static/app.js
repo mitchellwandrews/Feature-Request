@@ -1,57 +1,126 @@
 function TicketListViewModel(defaultPage) {
-  this.ticket = {};
   this.Page = ko.observable(defaultPage);
+  this.tickets = ko.observableArray([]);
+  this.ticketType = ko.observable();
+  this.ticket = {
+    'title': ko.observable(),
+    'client': ko.observable(),
+    'description': ko.observable(),
+    'client_priority': ko.observable(),
+    'target_date': ko.observable(),
+    'product_area': ko.observable(),
+    'id': ko.observable()
+  }
+  var self = this;
+
+  $.getJSON('/tickets', function(data){
+    self.tickets(data.tickets);
+    console.log(self.ticket.length);
+  })
 
   this.addTicket = function(){
-    console.log('TICKET', this.ticket);
+    var date = moment(this.ticket.target_date()).format('MMM D YYYY');
+    if(self.ticketType() === 'Add'){
+      $.ajax({
+        url: '/ticket/new',
+        contentType: 'application/json',
+        type: 'POST',
+        data: JSON.stringify({
+          'title': this.ticket.title(),
+          'description': this.ticket.description(),
+          'client': this.ticket.client(),
+          'client_priority': this.ticket.client_priority(),
+          'target_date': date,
+          'product_area': this.ticket.product_area()
+        })
+      }).done(function(data){
+        $.getJSON('/tickets', function(data){
+          self.tickets(data.tickets);
+        })
+        return self.goToIndex();
+      }).fail(function(data){
+        return console.log(data);
+      });
+    } else {
+      $.ajax({
+        url: '/ticket/update',
+        contentType: 'application/json',
+        type: 'POST',
+        data: JSON.stringify({
+          'id': this.ticket.id(),
+          'title': this.ticket.title(),
+          'description': this.ticket.description(),
+          'client': this.ticket.client(),
+          'client_priority': this.ticket.client_priority(),
+          'target_date': date,
+          'product_area': this.ticket.product_area()
+        })
+      }).done(function(data){
+        $.getJSON('/tickets', function(data){
+          self.tickets(data.tickets);
+        })
+        return self.goToIndex();
+      }).fail(function(data){
+        return console.log(data);
+      });
+    }
+  };
+
+  self.deleteTicket = function(){
+    ticket_id = self.ticket.id();
     $.ajax({
-      url: '/ticket/new',
+      url: '/ticket/delete',
       contentType: 'application/json',
       type: 'POST',
-      data: JSON.stringify({
-        'title': this.ticket.title,
-        'description': this.ticket.description,
-        'client': this.ticket.client,
-        'client_priority': this.ticket.client_priority,
-        'target_date': this.ticket.target_date,
-        'product_area': this.ticket.product_area
-      }),
-      success: function(data){
-        console.log(data);
-        return window.location = '/';
-      },
-      error: function() {
-        return console.log("FAIL");
-      }
+      data: JSON.stringify({'id': ticket_id})
+    }).done(function(data){
+      $('#deleteTicketModal').modal('hide');
+      $.getJSON('/tickets', function(data){
+        self.tickets(data.tickets);
+      })
+      return console.log(data);
+    }).fail(function(data){
+      return console.log(data);
     });
   };
 
-  this.goToTicket = function(id){
-    var page = $.ajax({
-      url: '/ticket',
-      contentType: 'application/json',
-      type: 'GET',
-      data: JSON.stringify({
-        'id': id
-      }),
-      success: function(data){
-        console.log(data);
-        return 'oneup';
-      },
-      error: function(){
-        return console.log("FAIL");
-      }
-    });
-    console.log(page);
+  self.goToTicket = function(ticket){
+    self.ticket.client(ticket.client);
+    self.ticket.title(ticket.title);
+    self.ticket.description(ticket.description);
+    self.ticket.client_priority(ticket.client_priority);
+    self.ticket.target_date(ticket.target_date);
+    self.ticket.product_area(ticket.product_area);
+    self.Page("oneup");
+  };
+
+  self.editTicket = function(ticket){
+    self.ticketType("Edit");
+    self.ticket.client(ticket.client);
+    self.ticket.title(ticket.title);
+    self.ticket.description(ticket.description);
+    self.ticket.client_priority(ticket.client_priority);
+    self.ticket.target_date(moment(ticket.target_date).utc());
+    self.ticket.product_area(ticket.product_area);
+    self.ticket.id(ticket.id);
+    self.Page("add");
+  }
+
+  self.showDeleteModal = function(ticket){
+    self.ticket.title(ticket.title);
+    self.ticket.id(ticket.id);
+    $('#deleteTicketModal').modal('show');
   };
 
   this.goToAdd = function() {
+    $('#ticketForm')[0].reset();
     this.Page("add");
   };
 
   this.goToIndex = function() {
     this.Page("index");
   };
+
 }
 
 ko.applyBindings(new TicketListViewModel('index'));

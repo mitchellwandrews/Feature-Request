@@ -12,6 +12,8 @@
     "bootstrap": "^4.0.0",
     "jquery": "^3.3.1",
     "knockout": "^3.5.0-beta",
+    "knockout-date-bindings": "^1.0.0",
+    "moment": "^2.21.0",
     "popper.js": "^1.12.9"
   }
 }
