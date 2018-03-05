@@ -48,14 +48,14 @@ def delete():
 @app.route('/ticket/update', methods=['POST'])
 def update():
     ticket = request.json
-    priority_query = ("select client, client_priority from tickets where client = :ticket")
-    priority_data = {'ticket': ticket['client']}
-    client_tickets = mydb.query_db(priority_query, priority_data)
-    for tick in client_tickets:
-        if (int(tick['client_priority']) == int(ticket['client_priority'])):
-            pquery = ("update tickets set client_priority = client_priority + 1 where client_priority >= {} and client = '{}'").format(ticket['client_priority'], ticket['client'])
-            mydb.query_db(pquery)
-            break
+    # priority_query = ("select client, client_priority from tickets where client = :ticket")
+    # priority_data = {'ticket': ticket['client']}
+    # client_tickets = mydb.query_db(priority_query, priority_data)
+    # for tick in client_tickets:
+    #     if (int(tick['client_priority']) == int(ticket['client_priority'])):
+    #         pquery = ("update tickets set client_priority = client_priority + 1 where client_priority >= {} and client = '{}'").format(ticket['client_priority'], ticket['client'])
+    #         mydb.query_db(pquery)
+    #         break
     query = ("update tickets set title = :title, description = :description, client = :client, client_priority = :client_priority, target_date = :target_date, product_area = :product_area where id = :id")
     data = {'title': ticket['title'], 'description': ticket['description'], 'client': ticket['client'], 'client_priority': ticket['client_priority'], 'target_date': ticket['target_date'], 'product_area': ticket['product_area'], 'id': ticket['id']}
     mydb.query_db(query, data)
