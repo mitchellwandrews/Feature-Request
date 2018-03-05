@@ -15,7 +15,6 @@ function TicketListViewModel(defaultPage) {
 
   $.getJSON('/tickets', function(data){
     self.tickets(data.tickets);
-    console.log(self.ticket.length);
   })
 
   this.addTicket = function(){
@@ -114,6 +113,14 @@ function TicketListViewModel(defaultPage) {
 
   this.goToAdd = function() {
     $('#ticketForm')[0].reset();
+    self.ticketType("Add");
+    self.ticket.client(null);
+    self.ticket.title(null);
+    self.ticket.description(null);
+    self.ticket.client_priority(null);
+    self.ticket.target_date(null);
+    self.ticket.product_area(null);
+    self.ticket.id(null);
     this.Page("add");
   };
 
