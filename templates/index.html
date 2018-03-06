@@ -92,7 +92,7 @@
             </div>
             <div class="form-group">
               <label>Client</label>
-              <select class="form-control" data-bind="value: ticket.client, event: {change: clientChange}">
+              <select class="form-control" data-bind="value: ticket.client, enable: priorityBool, event: {change: clientChange}">
                 <option>Client A</option>
                 <option>Client B</option>
                 <option>Client C</option>
