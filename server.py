@@ -59,5 +59,3 @@ def update():
     data = {'title': ticket['title'], 'description': ticket['description'], 'client': ticket['client'], 'client_priority': ticket['client_priority'], 'target_date': ticket['target_date'], 'product_area': ticket['product_area'], 'id': ticket['id']}
     mydb.query_db(query, data)
     return "ok"
-
-app.run(host='0.0.0.0', port=80)
