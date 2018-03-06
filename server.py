@@ -39,7 +39,6 @@ def ticket(ticket_id):
 @app.route('/ticket/delete', methods=['POST'])
 def delete():
     ticket_id = request.json
-    print ticket_id['id']
     query = "delete from tickets where id = :id"
     data = {'id': int(ticket_id['id'])}
     mydb.query_db(query, data)
