@@ -144,7 +144,7 @@ function TicketListViewModel(defaultPage) {
     var tickets = self.tickets();
     for(var i = 0; i < tickets.length; i++){
       if(tickets[i].client === self.ticket.client()){
-        if(tickets[i].client_priority > self.maxPriority()){
+        if(tickets[i].client_priority >= self.maxPriority()){
           self.maxPriority(tickets[i].client_priority + 1);
         }
       }
