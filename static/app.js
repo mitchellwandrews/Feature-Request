@@ -2,6 +2,8 @@ function TicketListViewModel(defaultPage) {
   this.Page = ko.observable(defaultPage);
   this.tickets = ko.observableArray([]);
   this.ticketType = ko.observable();
+  this.priorityBool = ko.observable(false);
+  this.maxPriority = ko.observable(1);
   this.ticket = {
     'title': ko.observable(),
     'client': ko.observable(),
@@ -71,7 +73,11 @@ function TicketListViewModel(defaultPage) {
       url: '/ticket/delete',
       contentType: 'application/json',
       type: 'POST',
-      data: JSON.stringify({'id': ticket_id})
+      data: JSON.stringify({
+        'id': self.ticket.id(),
+        'client': self.ticket.client(),
+        'client_priority': self.ticket.client_priority()
+      })
     }).done(function(data){
       $('#deleteTicketModal').modal('hide');
       $.getJSON('/tickets', function(data){
@@ -94,6 +100,8 @@ function TicketListViewModel(defaultPage) {
   };
 
   self.editTicket = function(ticket){
+    console.log("tickets",self.tickets());
+    self.priorityBool(false);
     self.ticketType("Edit");
     self.ticket.client(ticket.client);
     self.ticket.title(ticket.title);
@@ -107,14 +115,18 @@ function TicketListViewModel(defaultPage) {
 
   self.showDeleteModal = function(ticket){
     self.ticket.title(ticket.title);
+    self.ticket.client_priority(ticket.client_priority);
+    self.ticket.client(ticket.client);
     self.ticket.id(ticket.id);
     $('#deleteTicketModal').modal('show');
   };
 
   this.goToAdd = function() {
     $('#ticketForm')[0].reset();
+    self.priorityBool(true);
     self.ticketType("Add");
-    self.ticket.client(null);
+    self.ticket.client("Client A");
+    self.clientChange();
     self.ticket.title(null);
     self.ticket.description(null);
     self.ticket.client_priority(null);
@@ -126,6 +138,17 @@ function TicketListViewModel(defaultPage) {
 
   this.goToIndex = function() {
     this.Page("index");
+  };
+
+  this.clientChange = function(){
+    var tickets = self.tickets();
+    for(var i = 0; i < tickets.length; i++){
+      if(tickets[i].client === self.ticket.client()){
+        if(tickets[i].client_priority > self.maxPriority()){
+          self.maxPriority(tickets[i].client_priority + 1);
+        }
+      }
+    }
   };
 
 }

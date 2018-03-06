@@ -38,10 +38,14 @@ def ticket(ticket_id):
 
 @app.route('/ticket/delete', methods=['POST'])
 def delete():
-    ticket_id = request.json
+    ticket = request.json
+    print ticket
     query = "delete from tickets where id = :id"
-    data = {'id': int(ticket_id['id'])}
+    data = {'id': int(ticket['id'])}
     mydb.query_db(query, data)
+    pquery = ("update tickets set client_priority = client_priority - 1 where client_priority > :client_priority and client = :client")
+    pdata = {'client_priority': ticket['client_priority'], 'client': ticket['client']}
+    mydb.query_db(pquery, pdata)
     return "ok"
 
 @app.route('/ticket/update', methods=['POST'])
