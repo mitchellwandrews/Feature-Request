@@ -60,4 +60,4 @@ def update():
     mydb.query_db(query, data)
     return "ok"
 
-app.run('0.0.0.0', port=80)
+app.run(host='0.0.0.0', port=80)
