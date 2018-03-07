@@ -142,6 +142,7 @@ function TicketListViewModel(defaultPage) {
 
   this.clientChange = function(){
     var tickets = self.tickets();
+    self.maxPriority(1);
     for(var i = 0; i < tickets.length; i++){
       if(tickets[i].client === self.ticket.client()){
         if(tickets[i].client_priority >= self.maxPriority()){
