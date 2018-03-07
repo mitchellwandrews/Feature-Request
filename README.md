@@ -60,4 +60,5 @@
   <li>jQuery</li>
   <li>MomentJS</li>
   <li>Bootstrap</li>
+  <li>MySQL</li>
 </ul>
